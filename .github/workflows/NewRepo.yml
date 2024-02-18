@@ -23,12 +23,17 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo ${{ github.event.repository.name }}
+      - name: Set RepoName as Experiment for mlflow
+        run: sed -i '11s/RepoName/${{ github.event.repository.name }}/g' $GITHUB_WORKSPACE/Untitled.ipynb
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Commit changes
         run: |
-          sed -i '11s/RepoName/${{ github.event.repository.name }}/g' $GITHUB_WORKSPACE/Untitled.ipynb
-          echo test, and deploy your project.
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Set variable in file"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
